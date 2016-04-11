@@ -61,3 +61,6 @@ of length of element name), so indent is just a running total. Otherwise
 we take name lengths into account and indent must be an integer array that
 increases in size by one at each level!
 
+I had this other cool idea for using color to add a third dimension to the
+visualization.
+
