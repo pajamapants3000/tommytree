@@ -1,0 +1,63 @@
+tommytree
+
+Outline
+********
+
+The algorithm for the visualizer to follow (I can't think of another
+layout that works for arbitrary structures ...):
+
+Set initial depth to -1 if not restricted, otherwise simply set to desired
+depth (3 levels, set to 3); An 8-bit integer covers 256, so this would give us
+256 (or 255?) depth max due to overflow, which could be a nice prevention
+of infinite looping. Should we just stick with this always? It would also
+mean that we can't SET a depth greater than 127. Perhaps a nicer catch would
+be to test that depth < depth + 1, that way the infinite loop stops at 128...
+we would have a more consistent behavior. (not depth-1 > depth check because
+this way we allow the 127th and stop at the 128th (counting -1 to -128 then
+wraps to +127).
+
+For getting next level listing, use function pointer - this will allow
+generalizing to use in other applications.
+
+f(element, name_lens, depth, scroll, fn_get_children) =
+{
+  if depth == 0 or depth > (depth + 1)
+    return
+  Print element
+  children = (*fn_get_children)(self)
+  name_lens.push(element.len())
+  while (pop child)
+  {
+    newline
+    for len in name_lens[:-1] (can we do this? or move name_lens.push.)
+    {
+      add SPACE * (abs(floor(len/2)) - 1)
+      if len > 0
+        pipe (|)
+      else
+        SPACE
+      2 * SPACE
+    }
+    add SPACE * newdent
+    if children.size == 0
+      lower-left-corner peice.
+      name_lens[-1] = -name_lens[-1] (again, can we do this?)
+    else
+      right-facing 'T'
+    dash
+    space (?-yes! ensures even one-character names leave some room between pipes)
+    f(child, name_lens (copy of it!), depth-1, scroll)
+  }  
+}
+
+What if we hit the right edge of the screen? How about each time we do this,
+we cut half the screen and add a marker of some kind to indicate how many
+times this has happened? - From one line to the next!? No. Maybe if we were
+doing it by pages. Or we could put in an up/down/left/right control.
+Another time perhaps.
+
+Two possibilities with indent: same indent at each level (regardless
+of length of element name), so indent is just a running total. Otherwise
+we take name lengths into account and indent must be an integer array that
+increases in size by one at each level!
+
