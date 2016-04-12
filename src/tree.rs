@@ -13,68 +13,58 @@ use std::io::BufWriter;
 mod ancestry; // or use ancestry::* ? Are they the same?
 //}}}
 
-/// Recursive printer
-pub fn print_recurs<T, P>(current: P, names_len: Vec<i32>, depth: i32,//{{{
+/// Recursive printer - Starting to look a lot better!
+pub fn print_recurs<T, P>(current: P, prefix: &mut String, depth: i32,//{{{
                 get_children: T where T: Fn<P>(P) -> Children<P>, P: Ancestry) {
+
+    // Return if we have exceeded max depth
     if depth == 0 || depth > (depth +1) {
         return;
     }
-    // cd name
-    // let name_bytes: &[u8] = name.bytes().collect(); -- need this?
+
     let mut stdout_buf = BufWriter::new(stdout());
+    let name = current.get_name();
     let mut len: i32 = 0;
-    for ch as &[u8] in name.chars() { // this probably won't work; try it, then
-        stdout_buf.write(ch);       // if not, drop the "as &[u8]" and just use
-        len += 1;                   // this to get len, then write with .bytes()
+
+    for ch in name.chars() {
+        write!(stdout_buf, "{}", ch);
+        len += 1;
     }
-    names_len.push(len);
 
-    let children = get_children(name);
+    for _ in [0..len.div(2)] {
+        prefix.append(' ');
+    }
+    if len.div(2) == (len - 1).div(2) {     // add space for odd lengths
+        prefix.append(' ');
+    }
 
-    {
+    let children = get_children(current);
+
+    {   // flush before entering loop
         stdout_buf.lock();
         stdout_buf.flush();
     }
 
-    loop {
-        if let Some(child) = children.pop() {
+    if let children.pop() = Some(child) {
 
-            stdout_buf().write(b"\n");
+        write!(stdout_buf, "\n{}|\n{}", prefix);
 
-            for _len in &names_len[..names_len.len()] { // do -1 upper bound?
-                for _ in [1.._len.abs().div(2)] {       // make fn?
-                    stdout_buf().write(b" ");
-                }
-                if _len > 0 {
-                    stdout_buf().write(b"|");
-                } else {
-                    stdout_buf().write(b" ");
-                }
-                stdout_buf().write(b"  ");
-            }
+        let child_prefix = prefix.clone();
 
-            for _ in [1..len.abs().div(2)] {            // make fn?
-                stdout_buf().write(b" ");
-            }
+        if children.len() == 0 {        // currently on the last child
+            write!(stdout_buf, "-");    // bot-right corner character
+            child_prefix.std_append("   ");
+        } else {
+            write!(stdout_buf, "-");    // right-facing 'T' character
+            child_prefix.std_append("|  ");
+        }
 
-            if children.len() == 0 {
-                stdout_buf().write(b"-");
-                names_len[..names_len.len()] = -names_len[..names_len.len()]
-            } else {
-                stdout_buf().write(b"-");
-            }
+        {
+            stdout_buf.lock();
+            stdout_buf.flush();
+        }
 
-            stdout_buf().write(b"- ");
-
-            {
-                stdout_buf.lock();
-                stdout_buf.flush();
-            }
-
-            print_recurs(child, names_len, depth-1);
-
-        } else { break; }                       // children.pop() returns None
+        print_recurs(child, child_prefix, depth-1, get_children);
     }
-    // cd .. ?
 }
 //}}}
