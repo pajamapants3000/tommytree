@@ -7,9 +7,11 @@
 // TODO: Try to add more generic code that can be reused (ideally this
 //  file is larger than tree.rs
 
+use std::iter::Iterator;
+
 /// Get family names
 pub trait Ancestry {
-    type C: std::iter::Iterator;
+    type C: Iterator;
 
     fn my_name(&self) -> &str;
     fn my_children<C>(&self) -> C;

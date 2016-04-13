@@ -10,12 +10,13 @@ use std::io;//{{{
 use std::io::stdout;
 use std::io::BufWriter;
 
-mod ancestry; // or use ancestry::* ? Are they the same?
+use path::Children;
+use ancestry::Ancestry;
 //}}}
 
 /// Recursive printer - Starting to look a lot better!
 pub fn print_recurs<T, P>(current: P, prefix: &mut String, depth: i32,//{{{
-                get_children: T where T: Fn<P>(P) -> Children<P>, P: Ancestry) {
+                get_children: T) where T: Fn(P) -> Children, P: Ancestry {
 
     // Return if we have exceeded max depth
     if depth == 0 || depth > (depth +1) {
@@ -45,9 +46,9 @@ pub fn print_recurs<T, P>(current: P, prefix: &mut String, depth: i32,//{{{
         stdout_buf.flush();
     }
 
-    if let children.pop() = Some(child) {
+    if let Some(child) = children.pop() {
 
-        write!(stdout_buf, "\n{}|\n{}", prefix);
+        write!(stdout_buf, "\n{0}|\n{0}", prefix);
 
         let child_prefix = prefix.clone();
 

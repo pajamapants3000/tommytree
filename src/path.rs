@@ -9,50 +9,50 @@
 use std::path::PathBuf as Child;//{{{
 use std::path::MAIN_SEPARATOR;
 use std::fs::ReadDir;
-use std::iter::Iterator;
+use std::iter::{Iterator, empty};
+
+use ancestry::Ancestry;
 //}}}
 /// Our child iterator; uses ReadDir, which iterates over DirEntry types
-struct Children(std::fs::ReadDir);
+//struct Children(std::fs::ReadDir);
+type Children = ReadDir;
 
 /// Modify ReadDir to return Child types
 impl Iterator for Children {//{{{
     type Item = Child;
-
-    fn next(&mut self) -> Option(Item) {
-        if let Ok(dir_entry) = self.0.next() {
-            dir_entry.path()
-        } else {
-            panic!("error obtaining contents of directory");
-        }
+    fn next(&mut self) -> Option<Child> {
+        self.next().map(|dirent| dirent.path())
     }
 }
 //}}}
-/// Apply Ancestry to our Child type
+/// Apply Ancestry to our Child type (PathBuf)
 impl Ancestry for Child {//{{{
     type C = Children;              // iterator over Child objects
+
     fn my_name(&self) -> &str {
-        let name_str = self.to_str();
-        let rev_comp = name_str.rsplit(MAIN_SEPARATOR);
-        rev_comp.next()
+        self.to_str().rsplit(MAIN_SEPARATOR).next()
     }
-    fn get_children<C>(&self) -> C {
-        if self.is_symlink() or !self.is_dir() {
-            return Vec::<i8>::new().into_iter();
-        }
-        if let Ok(children) = Children(self.read_dir()) {
-            children
-        } else {
-            panic!("error: failed to generate children iterator");
-        }
+
+    fn my_children<C>(&self) -> C {
+        self.read_dir().unwrap_or(empty())
     }
-//}}}
-    /// Helper for get_children: test if path is symlink
-    fn is_symlink(&self) -> bool {//{{{
-        if let Ok(md) = self.metadata() {
-            md.file_type().is_symlink()
-        } else { false }    // return false if any errors to stop processing
-    }
+
 //}}}
 }
 
+//{{{
+/* lines removed from get_children: I don't think I need any of this,
+ * but I'm saving it for now
+if self.is_symlink() or !self.is_dir() {
+    return std::iter::empty();    // return empty iterator
+}
+/// Helper for get_children: test if path is symlink
+#[allow(dead_code)]
+fn is_symlink(s: PathBuf) -> bool {//{{{
+    if let Ok(md) = s.metadata() {
+        md.file_type().is_symlink()
+    } else { true }     // return true if any errors to stop processing;
+}                       // tree will post name and not attempt to process
+//}}}                   // children
+*/
 
