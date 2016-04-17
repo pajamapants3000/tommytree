@@ -1,8 +1,9 @@
 [package]
-name = "tommytree"
+name = "tree"
 version = "0.1.0"
 authors = ["Tommy Lincoln <pajamapants3000@gmail.com>"]
 
 [dependencies]
 getopts = "0.2"
+
 

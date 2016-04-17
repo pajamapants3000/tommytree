@@ -1,7 +1,7 @@
 /*
  * File   : main.rs
  * Purpose: main executable
- * Program: tommytree
+ * Program: tree
  * About  : prints directory structure in a visually clear tree-like diagram
  * Authors: Tommy Lincoln <pajamapants3000@gmail.com>
  * License: MIT; See LICENSE!
@@ -25,8 +25,13 @@ fn main() {//{{{
     let args: Vec<String> = env::args().collect();
     let program = args[0].clone();
     let mut opts = Options::new();
-    opts.optopt("d", "", "Depth of tree [unlimited]", "DEPTH");
+    opts.optopt("d", "depth", "Depth of tree [-1]", "DEPTH");
     opts.optflag("h", "help", "Display usage");
+    // Not implemented:
+    opts.optopt("x", "exclude", "Exclude entries that match PATTERN []", "PATTERN");
+    opts.optopt("s", "size", "Maximum directory size to expand [-1]", "MAXCHILD");
+    opts.optflag("D", "dirs", "Only show directories");
+
     let matches = match opts.parse(&args[1..]) {
         Ok(m) => m,
         Err(f) => {
@@ -125,8 +130,10 @@ pub fn print_tree(thisdir: PathBuf, prefix: &mut String, depth: i8) {//{{{
     }
     let mut child_prefix = my_prefix.clone();
     child_prefix.push_str("|  ");
+    let mut emptydir: &mut bool = &mut true;
     loop {
         if let Some(result) = children.pop() {
+            *emptydir = false;
             let child = result.expect(&format!("error reading contents of {}", name));
             write!(stdout_buf, "\n{0}|\n{0}", my_prefix).unwrap();
 
@@ -142,6 +149,9 @@ pub fn print_tree(thisdir: PathBuf, prefix: &mut String, depth: i8) {//{{{
             stdout_buf.flush().expect("error writing to stdout");
             print_tree(child.path(), &mut child_prefix, depth-1);
         } else {
+            if *emptydir {
+                write!(stdout_buf, "\n{0}|", my_prefix).unwrap();
+            }
             break;
         }
     }
