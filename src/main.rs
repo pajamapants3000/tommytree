@@ -52,12 +52,13 @@ fn main() {//{{{
     let depth: i8 = depth.parse().unwrap();     // can use overflow for max?
 
     let root: &str = match matches.free.len() {
+        0 => ".",
         1 => &matches.free[0],
-        x => {
-            println!("error: {} args instead of just one", x);
+        _ => {
+            println!("error: too many arguments!");
             for s in matches.free {
                 println!("{}", s);
-                println!("(pick just one!)");
+                println!("(pick just one)");
             }
             return;
         },
