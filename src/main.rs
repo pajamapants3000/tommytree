@@ -140,7 +140,7 @@ pub fn print_tree(thisdir: PathBuf, prefix: &mut String, depth: i8) {//{{{
             if !children.is_empty() {
                 write!(stdout_buf, "|- ").unwrap();    // right-facing 'T' character
             } else {
-                write!(stdout_buf, "-- ").unwrap();    // bot-left-corner character
+                write!(stdout_buf, "*- ").unwrap();    // bot-left-corner character
                 let changelen = child_prefix.len() - 3;
                 child_prefix.truncate(changelen);
                 child_prefix.push_str("   ");
