@@ -25,12 +25,16 @@ fn main() {//{{{
     let args: Vec<String> = env::args().collect();
     let program = args[0].clone();
     let mut opts = Options::new();
-    opts.optopt("d", "depth", "Depth of tree [-1]", "DEPTH");
     opts.optflag("h", "help", "Display usage");
-    // Not implemented:
-    opts.optopt("x", "exclude", "Exclude entries that match PATTERN []", "PATTERN");
-    opts.optopt("s", "size", "Maximum directory size to expand [-1]", "MAXCHILD");
-    opts.optflag("D", "dirs", "Only show directories");
+    opts.optopt("d", "depth", "Depth of tree [-1]", "DEPTH");
+    // Not yet implemented:
+    opts.optopt("x", "exclude",
+                "Exclude entries that match PATTERN [] (Not impl.)",
+                "PATTERN");
+    opts.optopt("s", "size",
+                "Maximum directory size to expand [-1] (Not impl.)",
+                "MAXCHILD");
+    opts.optflag("D", "dirs", "Only show directories (Not impl.)");
 
     let matches = match opts.parse(&args[1..]) {
         Ok(m) => m,
@@ -81,7 +85,15 @@ fn main() {//{{{
 }
 //}}}
 fn print_usage(program: &str, opts: Options) {//{{{
-    let brief = format!("{} ROOT [options]", program);
+    let brief = format!(
+        "\n|^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^\
+         \n*                         _____    |\
+         \n|      _                 /     |   *\
+         \n* @-^_/ \\    *~~ tree ~~*      \\_* |\
+         \n|    /   \\__/            `--@      *\
+         \n*   @                              |\
+         \n`^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^\
+         \n\n\nUsage: {} <root_directory> [Options]", program);
     println!("{}", opts.usage(&brief));
 }
 //}}}
