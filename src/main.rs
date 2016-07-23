@@ -93,7 +93,7 @@ fn print_usage(program: &str, opts: Options) {//{{{
          \n\t|    /   \\__/            `--@      *\
          \n\t*   @                              |\
          \n\t`^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^\
-         \n\n\nUsage: {} <root_directory> [Options]", program);
+         \n\n\nUsage: {} [<root_directory>] [Options]", program);
     println!("{}", opts.usage(&brief));
 }
 //}}}
